@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}클래스로 마켓{% endblock %}</title>
+  {# 글꼴: Noto Sans KR (구글 폰트) #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+{# body_class: 상세 화면처럼 아래 고정 바가 있는 화면은 여백을 더 준다 #}
+<body class="{% block body_class %}{% endblock %}">
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="{{ url_for('home') }}">클래스로 마켓</a>
+      <nav aria-label="주 메뉴">
+        {# 지금 보고 있는 화면의 메뉴에 aria-current 를 붙여 강조한다 #}
+        <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>홈</a>
+        <a href="{{ url_for('classes') }}" {% if request.endpoint in ('classes', 'detail') %}aria-current="page"{% endif %}>클래스</a>
+        <a href="{{ url_for('wishlist') }}" {% if request.endpoint == 'wishlist' %}aria-current="page"{% endif %}>찜 목록 ({{ wish_count }})</a>
+        <a href="{{ url_for('about') }}" {% if request.endpoint == 'about' %}aria-current="page"{% endif %}>소개</a>
+      </nav>
+    </div>
+  </header>
+
+  {# 홈 화면의 남색 큰 머리 영역이 들어가는 자리 #}
+  {% block hero %}{% endblock %}
+
+  <main>
+    {# 한 번만 보이는 안내 (flash) #}
+    {% for m in get_flashed_messages() %}<p class="flash" role="status">✅ {{ m }}</p>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>© 클래스로 마켓 · Flask 연습용 서비스</footer>
+
+  {# 화면 아래에 붙는 영역 (상세 화면의 가격 + 신청하기 바) #}
+  {% block bottom %}{% endblock %}
+</body>
+</html>

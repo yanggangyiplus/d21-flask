@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_parts.html" import price, thumb %}
+
+{% block hero %}
+{# 남색 머리 영역: 전체 클래스 개수 #}
+<section class="hero">
+  <div class="hero__inner">
+    <h1>클래스로 마켓에 오신것을 환영해요</h1>
+    <p>지금 <strong>{{ total }}개</strong>의 클래스가 있어요.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+{# 카테고리 칩: 가로로 밀어서 본다. 누르면 그 카테고리만 거른 목록으로 간다 #}
+<section class="section">
+  <h2 class="section__title">카테고리</h2>
+  <div class="chips">
+    <a class="chip" href="{{ url_for('classes') }}">전체 보기</a>
+    {% for c in categories %}
+    <a class="chip" href="{{ url_for('classes', category=c) }}">{{ c }}</a>
+    {% endfor %}
+  </div>
+</section>
+
+{# 지금 할인중: 할인 중인 클래스만 가로 스크롤 카드로 (app.py 의 sales). 하나도 없으면 섹션 자체를 숨긴다 #}
+{% if sales %}
+<section class="section">
+  <div class="section__head">
+    <h2 class="section__title">지금 할인중 <span class="tag">SALE</span></h2>
+    <a class="more" href="{{ url_for('classes') }}">클래스 전체</a>
+  </div>
+  <div class="hscroll">
+    {% for c in sales %}
+    <a class="card card--mini" href="{{ url_for('detail', class_id=c.id) }}">
+      {{ thumb(c, categories, 'mini') }}
+      <div class="card__body">
+        <p class="meta">{{ c.category }} · {{ c.region }}</p>
+        <h3 class="card__name">{{ c.name }}</h3>
+        <p class="price">{{ price(c) }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<p class="sub-link"><a href="{{ url_for('hello', name='손님') }}">인사 화면 보기</a></p>
+{% endblock %}

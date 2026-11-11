@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "_parts.html" import price, rating, thumb %}
+{% block title %}클래스 목록 · 클래스로 마켓{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>클래스 목록</h1>
+  {% if items %}<span class="count">{{ items|length }}개</span>{% endif %}
+</div>
+
+{# 카테고리 칩: 누르면 주소 뒤에 ?category=... 가 붙어서 이 화면이 다시 열린다.
+   지금 고른 정렬(sort)은 그대로 유지한다. None 인 값은 url_for 가 주소에서 빼 준다 #}
+<nav class="filter" aria-label="카테고리 고르기">
+  <div class="chips">
+    <a class="chip{% if not category %} is-active{% endif %}" href="{{ url_for('classes', sort=sort or None) }}" {% if not category %}aria-current="true"{% endif %}>전체</a>
+    {% for c in categories %}
+    <a class="chip{% if c == category %} is-active{% endif %}" href="{{ url_for('classes', category=c, sort=sort or None) }}" {% if c == category %}aria-current="true"{% endif %}>{{ c }}</a>
+    {% endfor %}
+  </div>
+</nav>
+
+{# 정렬 칩: 지금 고른 카테고리는 그대로 유지한다 #}
+<nav class="filter" aria-label="정렬">
+  <div class="chips chips--sort">
+    {% for value, label in [('', '기본 순서'), ('price', '가격 싼 순'), ('rating', '평점 높은 순')] %}
+    <a class="chip chip--sm{% if sort == value %} is-active{% endif %}" href="{{ url_for('classes', category=category or None, sort=value or None) }}" {% if sort == value %}aria-current="true"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </div>
+</nav>
+
+{# 결과가 하나도 없으면 빈 상태 화면, 있으면 카드를 쭉 보여 준다 #}
+{% if not items %}
+<div class="empty">
+  <div class="empty__icon" aria-hidden="true">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+  </div>
+  <p class="empty__title">조건에 맞는 클래스가 없어요</p>
+  <p class="empty__desc">다른 카테고리를 골라 보세요.</p>
+  <a class="btn btn--primary" href="{{ url_for('classes') }}">전체 클래스 보기</a>
+</div>
+{% else %}
+<div class="cards">
+  {% for c in items %}
+  {# 카드 전체가 링크: 누르면 /class/번호 상세 화면으로 간다 #}
+  <a class="card" href="{{ url_for('detail', class_id=c.id) }}">
+    {{ thumb(c, categories) }}
+    <div class="card__body">
+      <p class="meta">{{ c.category }} · {{ c.region }}</p>
+      <h2 class="card__name">{{ c.name }}</h2>
+      <p class="rating">{{ rating(c) }}</p>
+      <p class="price">{{ price(c) }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

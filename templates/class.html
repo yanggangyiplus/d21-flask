@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "_parts.html" import price, rating, thumb %}
+{% block title %}{{ c.name }} · 클래스로 마켓{% endblock %}
+{% block body_class %}has-buybar{% endblock %}
+{% block content %}
+{# 이 클래스의 카테고리만 거른 목록으로 돌아가는 링크 #}
+<p class="back"><a href="{{ url_for('classes', category=c.category) }}">← {{ c.category }} 목록</a></p>
+
+<article class="detail">
+  {{ thumb(c, [], 'hero') }}
+  <div class="detail__body">
+    <p class="meta"><span class="badge">{{ c.category }}</span> {{ c.region }}</p>
+    <h1>{{ c.name }}</h1>
+    <p class="rating">{{ rating(c) }}</p>
+    <form method="post" action="{{ url_for('wish', class_id=c.id) }}">
+      <button class="btn">{{ '♥ 찜 취소' if wished else '♡ 찜하기' }}</button>
+    </form>
+  </div>
+</article>
+
+<section class="reviews" aria-labelledby="rv-h">
+  <h2 id="rv-h">수강 후기 ({{ reviews|length }})</h2>
+  {# 브라우저 검사(required · maxlength)는 편의용. 진짜 검사는 서버(validate.py)가 한다 #}
+  <form method="post" novalidate>
+    <p><label for="nickname">닉네임 (1~20자)</label><br>
+      <input id="nickname" name="nickname" maxlength="20" required value="{{ form.get('nickname', '') }}">
+      {% if errors.nickname %}<br><span class="err" role="alert">⚠ {{ errors.nickname }}</span>{% endif %}</p>
+    <p><label for="rating">별점</label><br>
+      <select id="rating" name="rating" required>
+        <option value="">선택</option>
+        {% for n in range(1, 6) %}<option value="{{ n }}" {{ 'selected' if form.get('rating') == n|string }}>{{ '★' * n }} ({{ n }})</option>{% endfor %}
+      </select>
+      {% if errors.rating %}<br><span class="err" role="alert">⚠ {{ errors.rating }}</span>{% endif %}</p>
+    <p><label for="content">후기 (1~200자)</label><br>
+      <textarea id="content" name="content" maxlength="200" required rows="3">{{ form.get('content', '') }}</textarea>
+      {% if errors.content %}<br><span class="err" role="alert">⚠ {{ errors.content }}</span>{% endif %}</p>
+    <button class="btn btn--primary">후기 남기기</button>
+  </form>
+  <ul class="review-list">
+    {% for r in reviews %}
+    <li><strong>{{ r[0] }}</strong> · {{ '★' * r[1] }} · {{ r[3] }}<br>{{ r[2] }}</li>
+    {% else %}<li>아직 남겨진 후기가 없어요</li>{% endfor %}
+  </ul>
+</section>
+{% endblock %}
+
+{% block bottom %}
+{# 화면 아래 고정 바: 가격 + 신청하기.
+   ⚠ 신청 기능(주문·결제·로그인)은 아직 없어서, 버튼은 '준비 중' 안내만 띄운다 #}
+<div class="buybar">
+  <div class="buybar__inner">
+    <p class="price price--lg">{{ price(c) }}</p>
+    <button type="button" class="btn btn--primary btn--lg" id="apply-btn">신청하기</button>
+  </div>
+  <p class="toast" id="apply-toast" role="status" aria-live="polite"></p>
+</div>
+<script>
+  // 신청하기를 누르면 '준비 중' 안내를 2.5초 보여 준다
+  (function () {
+    var btn = document.getElementById('apply-btn');
+    var toast = document.getElementById('apply-toast');
+    var timer;
+    btn.addEventListener('click', function () {
+      toast.textContent = '신청 기능은 준비 중이에요.';
+      clearTimeout(timer);
+      timer = setTimeout(function () { toast.textContent = ''; }, 2500);
+    });
+  })();
+</script>
+{% endblock %}

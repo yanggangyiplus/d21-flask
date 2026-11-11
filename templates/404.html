@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}찾는 페이지가 없어요 · 클래스로 마켓{% endblock %}
+{% block content %}
+<div class="empty">
+  <div class="empty__icon" aria-hidden="true">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+  </div>
+  <h1 class="empty__title">찾는 페이지가 없어요</h1>
+  <p class="empty__desc">주소가 바뀌었거나 없는 클래스예요.</p>
+  <a class="btn btn--primary" href="{{ url_for('classes') }}">클래스 목록으로</a>
+</div>
+{% endblock %}

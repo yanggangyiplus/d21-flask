@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}찜 목록 · 클래스로 마켓{% endblock %}
+{% block content %}
+<h1>찜 목록</h1>
+<ul>
+  {% for c in items %}<li><a href="{{ url_for('detail', class_id=c.id) }}">{{ c.name }}</a></li>
+  {% else %}<li>아직 찜한 클래스가 없어요</li>{% endfor %}
+</ul>
+{% endblock %}
